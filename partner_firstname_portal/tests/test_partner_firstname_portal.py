@@ -25,8 +25,8 @@ class TestPartnerFirstnamePortal(HttpCase):
         )
         cls.user_portal = cls.env["res.users"].create(
             {
-                "login": "portal",
-                "password": "portal",
+                "login": "portal_firstname_portal_test",
+                "password": "admin",
                 "partner_id": cls.partner_portal.id,
                 "group_ids": [Command.set([cls.env.ref("base.group_portal").id])],
             }
