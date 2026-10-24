@@ -62,6 +62,19 @@ class PartnerFirstnameCustomerPortal(CustomerPortal):
             )
         )
         required_fields = get_config_required()
+        if partner_sudo.is_company:
+            # The mandatory fields are computed without the partner, so
+            # firstname / lastname are always required: a company only has a
+            # name.
+            if missing_fields & {"firstname", "lastname"}:
+                missing_fields -= {"firstname", "lastname"}
+                if not address_values.get("name"):
+                    missing_fields.add("name")
+                elif not missing_fields:
+                    empty_msg = self.env._("Some required fields are empty.")
+                    if empty_msg in error_messages:
+                        error_messages.remove(empty_msg)
+            return invalid_fields, missing_fields, error_messages
         if "name" in missing_fields and not partner_sudo.is_company:
             missing_fields.remove("name")
             if not missing_fields:
