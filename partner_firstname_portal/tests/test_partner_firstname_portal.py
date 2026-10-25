@@ -11,12 +11,18 @@ class TestPartnerFirstnamePortal(HttpCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        belgium = cls.env.ref("base.be")
+        # partner_country_state_required may require a state for Belgium
+        state = cls.env["res.country.state"].search(
+            [("country_id", "=", belgium.id)], limit=1
+        )
         # Generated with https://www.fakenamegenerator.com
         cls.partner_portal = cls.env["res.partner"].create(
             {
                 "name": "Théodule Bernier",
                 "email": "theodule_bernier@jourrapide.com",
-                "country_id": cls.env.ref("base.be").id,
+                "country_id": belgium.id,
+                "state_id": state.id,
                 "phone": "0487 49 15 23",
                 "street": "Hooivelden 198",
                 "zip": "4720",
@@ -35,6 +41,7 @@ class TestPartnerFirstnamePortal(HttpCase):
             "name": cls.user_portal.partner_id.name,
             "partner_id": cls.user_portal.partner_id.id,
             "country_id": cls.user_portal.country_id.id,
+            "state_id": cls.user_portal.state_id.id,
             "email": cls.user_portal.email,
             "phone": cls.user_portal.phone,
             "street": cls.user_portal.street,
