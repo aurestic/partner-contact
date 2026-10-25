@@ -33,3 +33,13 @@ class TestConfigSettings(TransactionCase):
         self.assertTrue(self.config.partner_names_order_changed)
         self.config.action_recalculate_partners_name()
         self.assertFalse(self.config.partner_names_order_changed)
+
+    def test_recalculate_updates_complete_name(self):
+        partner = self.env["res.partner"].create(
+            {"firstname": "Firstname", "lastname": "Lastname"}
+        )
+        self.config.partner_names_order = "last_first_comma"
+        self.config.action_recalculate_partners_name()
+        self.env.flush_all()
+        self.assertEqual(partner.name, "Lastname, Firstname")
+        self.assertEqual(partner.complete_name, partner.name)

@@ -80,7 +80,13 @@ class ResConfigSettings(models.TransientModel):
         # Use add_to_compute instead of _compute_name to avoid triggering
         # _inverse_name_after_cleaning_whitespace, which can
         # modify a partner's firstname, lastname and lastname2
-        self.env.add_to_compute(self.env["res.partner"]._fields["name"], partners)
+        Partner = self.env["res.partner"]
+        self.env.add_to_compute(Partner._fields["name"], partners)
+        # complete_name depends on name, but it is not triggered when name is
+        # recomputed this way: recompute it too (also on child contacts)
+        self.env.add_to_compute(
+            Partner._fields["complete_name"], partners | partners.child_ids
+        )
         self.partner_names_order_changed = False
         self.execute()
         _logger.info("%d partners updated.", len(partners))
